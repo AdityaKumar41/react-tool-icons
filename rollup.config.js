@@ -9,10 +9,6 @@ const config = {
       file: 'dist/index.esm.js',
       format: 'esm',
     },
-    {
-      file: 'dist/index.cjs.js',
-      format: 'cjs',
-    },
   ],
   external: [/@babel\/runtime/, 'react'],
   plugins: [

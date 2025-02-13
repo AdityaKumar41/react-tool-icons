@@ -1,6 +1,6 @@
 {
   "name": "react-tool-icons",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "SVG-based React icon components",
   "keywords": [
     "React",
@@ -29,7 +29,36 @@
   "workspaces": [
     "packages/*"
   ],
-  "author": "Mykhaylo Ryechkin",
+  "author": "Aditya Moharana",
+  "contributors": [
+    {
+      "name": "Aditya Moharana",
+      "url": "https://github.com/AdityaKumar41",
+      "email": "adityamoharana80@gmail.com"
+    },
+    {
+      "name": "Yash Rana",
+      "url": "https://github.com/yash-rana0101",
+      "email": "ranayash812@gmail.com"
+    },
+    {
+      "name": "Toshak Parmar",
+      "url": "https://github.com/toshakparmar",
+      "email": "toshakparmar2000@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AdityaKumar41/react-tool-icons"
+  },
+  "homepage": "https://github.com/AdityaKumar41/react-tool-icons#readme",
+  "bugs": {
+    "url": "https://github.com/AdityaKumar41/react-tool-icons/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "contributes": {},
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.24.9",
@@ -42,6 +71,7 @@
     "@svgr/core": "^6.5.1",
     "@svgr/plugin-jsx": "^6.5.1",
     "@svgr/plugin-svgo": "^6.5.1",
+    "@svgr/rollup": "^8.1.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@types/react": "^19.0.8",
@@ -68,13 +98,16 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.24.8",
-    "tslib": "^2.8.1",
     "glob": "^8.0.3",
-    "mkdirp": "^3.0.1"
+    "mkdirp": "^3.0.1",
+    "tslib": "^2.8.1"
   },
   "peerDependencies": {
     "react": "15.x.x || 16.x.x || 17.x.x || 18.x.x",
     "react-dom": "15.x.x || 16.x.x || 17.x.x || 18.x.x"
   },
-  "packageManager": "pnpm@8.15.3"
+  "packageManager": "pnpm@8.15.3",
+  "engines": {
+    "node": ">=14"
+  }
 }

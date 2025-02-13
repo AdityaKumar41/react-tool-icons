@@ -13,6 +13,7 @@ async function buildIcons() {
     await ensureDir(srcIconsDir);
 
     const categories = await fs.readdir(assetsDir);
+    const allExports = new Map(); // Track all exports to check for duplicates
 
     for (const category of categories) {
       const categoryPath = path.join(assetsDir, category);
@@ -29,11 +30,15 @@ async function buildIcons() {
       for (const svgFile of svgFiles) {
         try {
           const content = await fs.readFile(path.join(categoryPath, svgFile), 'utf8');
-          const componentName = `${path
+          const baseName = path
             .basename(svgFile, '.svg')
             .split('-')
             .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-            .join('')}Icon`;
+            .join('');
+
+          // Add category prefix to component name
+          const categoryPrefix = category.charAt(0).toUpperCase() + category.slice(1);
+          const componentName = `${categoryPrefix}${baseName}Icon`;
 
           console.log(`Converting: ${svgFile} to ${componentName}`);
 
@@ -75,13 +80,7 @@ const ${componentName}: React.FC<${componentName}Props> = ({
   ...props
 }) => (
   <svg
-    ${svgOutput
-      .match(/<svg([^>]*)>/)[1]
-      .trim()
-      .replace(/width="[^"]*"/, '')
-      .replace(/height="[^"]*"/, '')}
-    width={size}
-    height={size}
+    ${svgOutput.match(/<svg([^>]*)>/)[1].trim()}
     className={className}
     {...props}
   >
@@ -96,6 +95,12 @@ export default ${componentName};
 
           await fs.writeFile(path.join(outputDir, `${componentName}.tsx`), componentCode);
           categoryExports.push(componentName);
+
+          // Track exports
+          if (allExports.has(baseName + 'Icon')) {
+            console.log(`Note: ${baseName}Icon exists in multiple categories`);
+          }
+          allExports.set(baseName + 'Icon', category);
         } catch (error) {
           console.error(`Error converting ${svgFile}:`, error);
         }
@@ -109,7 +114,7 @@ export default ${componentName};
       }
     }
 
-    // Create main index.ts
+    // Create main index.ts with explicit exports
     const mainIndexContent = categories
       .map((category) => `export * from './icons/${category}';`)
       .join('\n');
