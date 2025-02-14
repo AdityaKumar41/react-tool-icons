@@ -1,26 +1,46 @@
-const fs = require('fs').promises;
-const path = require('path');
-const { transform } = require('@svgr/core');
+import { promises as fs } from 'fs';
+import { join, basename, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { transform } from '@svgr/core';
+import prettier from 'prettier';
+import generateComponentCode from '../templates/svgr-template.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 async function ensureDir(dir) {
   await fs.mkdir(dir, { recursive: true }).catch(() => {});
 }
 
+async function formatCode(code) {
+  try {
+    const prettierConfig = await prettier.resolveConfig(process.cwd());
+    return prettier.format(code, {
+      ...prettierConfig,
+      parser: 'typescript',
+    });
+  } catch (error) {
+    console.warn('Warning: Could not format code:', error);
+    return code;
+  }
+}
+
 async function buildIcons() {
   try {
-    const assetsDir = path.join(__dirname, '../assets');
-    const srcIconsDir = path.join(__dirname, '../src/icons');
+    const assetsDir = join(__dirname, '../assets');
+    const srcIconsDir = join(__dirname, '../src/icons');
     await ensureDir(srcIconsDir);
 
     const categories = await fs.readdir(assetsDir);
-    const allExports = new Map(); // Track all exports to check for duplicates
+    const allExports = new Map();
 
     for (const category of categories) {
-      const categoryPath = path.join(assetsDir, category);
-      if (!(await fs.stat(categoryPath)).isDirectory()) continue;
+      const categoryPath = join(assetsDir, category);
+      const stats = await fs.stat(categoryPath);
+      if (!stats.isDirectory()) continue;
 
       console.log(`Processing category: ${category}`);
-      const outputDir = path.join(srcIconsDir, category);
+      const outputDir = join(srcIconsDir, category);
       await ensureDir(outputDir);
 
       const files = await fs.readdir(categoryPath);
@@ -29,14 +49,12 @@ async function buildIcons() {
 
       for (const svgFile of svgFiles) {
         try {
-          const content = await fs.readFile(path.join(categoryPath, svgFile), 'utf8');
-          const baseName = path
-            .basename(svgFile, '.svg')
+          const content = await fs.readFile(join(categoryPath, svgFile), 'utf8');
+          const baseName = basename(svgFile, '.svg')
             .split('-')
             .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
             .join('');
 
-          // Add category prefix to component name
           const categoryPrefix = category.charAt(0).toUpperCase() + category.slice(1);
           const componentName = `${categoryPrefix}${baseName}Icon`;
 
@@ -65,38 +83,12 @@ async function buildIcons() {
             { componentName }
           );
 
-          const componentCode = `import React from 'react';
+          const componentCode = await generateComponentCode(componentName, svgOutput);
+          const formattedCode = await formatCode(componentCode);
 
-interface ${componentName}Props extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  color?: string;
-  className?: string;
-}
-
-const ${componentName}: React.FC<${componentName}Props> = ({
-  size = 24,
-  color = "currentColor",
-  className,
-  ...props
-}) => (
-  <svg
-    ${svgOutput.match(/<svg([^>]*)>/)[1].trim()}
-    className={className}
-    {...props}
-  >
-    ${svgOutput.match(/<svg[^>]*>(.*?)<\/svg>/s)[1]}
-  </svg>
-);
-
-${componentName}.displayName = '${componentName}';
-
-export default ${componentName};
-`;
-
-          await fs.writeFile(path.join(outputDir, `${componentName}.tsx`), componentCode);
+          await fs.writeFile(join(outputDir, `${componentName}.tsx`), formattedCode);
           categoryExports.push(componentName);
 
-          // Track exports
           if (allExports.has(baseName + 'Icon')) {
             console.log(`Note: ${baseName}Icon exists in multiple categories`);
           }
@@ -110,15 +102,17 @@ export default ${componentName};
         const indexContent = categoryExports
           .map((name) => `export { default as ${name} } from './${name}';`)
           .join('\n');
-        await fs.writeFile(path.join(outputDir, 'index.ts'), indexContent);
+        const formattedIndex = await formatCode(indexContent);
+        await fs.writeFile(join(outputDir, 'index.ts'), formattedIndex);
       }
     }
 
-    // Create main index.ts with explicit exports
+    // Create main index.ts
     const mainIndexContent = categories
       .map((category) => `export * from './icons/${category}';`)
       .join('\n');
-    await fs.writeFile(path.join(srcIconsDir, '../index.ts'), mainIndexContent);
+    const formattedMainIndex = await formatCode(mainIndexContent);
+    await fs.writeFile(join(srcIconsDir, '../index.ts'), formattedMainIndex);
 
     console.log('✅ Icons built successfully!');
   } catch (error) {
