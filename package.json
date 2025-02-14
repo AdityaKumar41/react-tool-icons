@@ -1,6 +1,6 @@
 {
   "name": "react-tool-icons",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "SVG-based React icon components",
   "keywords": [
     "React",
@@ -12,6 +12,7 @@
   "files": [
     "dist"
   ],
+  "type": "module",
   "scripts": {
     "clean": "rimraf dist src/icons src/index.ts",
     "prebuild": "npm run clean",
@@ -24,7 +25,8 @@
     "lint": "eslint . --ext .ts,.tsx,.json",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "validate": "npm run lint && npm run typecheck && npm run test && publint"
+    "validate": "npm run lint && npm run lint:security && npm run typecheck && npm run test && publint",
+    "lint:security": "eslint . --plugin security --plugin react-security"
   },
   "workspaces": [
     "packages/*"
@@ -75,7 +77,8 @@
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@types/react": "^19.0.8",
-    "@typescript-eslint/parser": "^8.22.0",
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
@@ -83,6 +86,8 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-security": "^0.1.0",
+    "eslint-plugin-security": "^3.0.1",
     "global-jsdom": "^26.0.0",
     "jsdom": "^26.0.0",
     "playwright": "^1.45.3",
@@ -103,8 +108,8 @@
     "tslib": "^2.8.1"
   },
   "peerDependencies": {
-    "react": "15.x.x || 16.x.x || 17.x.x || 18.x.x",
-    "react-dom": "15.x.x || 16.x.x || 17.x.x || 18.x.x"
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "17.0.0 || 18.0.0 || ^19.0.0"
   },
   "packageManager": "pnpm@8.15.3",
   "engines": {

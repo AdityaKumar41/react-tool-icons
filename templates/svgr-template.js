@@ -1,29 +1,46 @@
-function template(variables, { tpl }) {
-  return tpl`
-import * as React from 'react';
-
-interface Props extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  color?: string;
+// Function to extract SVG content and props
+function extractSvgContent(svgOutput) {
+  const svgMatch = svgOutput.match(/<svg([^>]*)>(.*?)<\/svg>/s);
+  if (!svgMatch) throw new Error('Invalid SVG output');
+  return {
+    props: svgMatch[1].trim(),
+    content: svgMatch[2].trim(),
+  };
 }
 
-const ${variables.componentName} = ({ size = 24, color = "currentColor", ...props }: Props) => (
-  <svg 
+// Main component generator function
+export function generateComponentCode(componentName, svgOutput) {
+  const { props, content } = extractSvgContent(svgOutput);
+
+  return `import React from 'react';
+
+interface ${componentName}Props extends React.SVGProps<SVGSVGElement> {
+  size?: number;
+  color?: string;
+  className?: string;
+}
+
+const ${componentName}: React.FC<${componentName}Props> = ({
+  size = 32,
+  color = "currentColor",
+  className,
+  ...props
+}) => (
+  <svg
     width={size}
     height={size}
     fill={color}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
+    ${props}
+    className={className}
     {...props}
   >
-    ${variables.jsx}
+    ${content}
   </svg>
 );
 
-${variables.componentName}.displayName = '${variables.componentName}';
+${componentName}.displayName = '${componentName}';
 
-export default ${variables.componentName};
-`;
+export default ${componentName};`;
 }
 
-module.exports = template;
+export default generateComponentCode;
