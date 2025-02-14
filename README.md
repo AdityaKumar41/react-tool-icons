@@ -153,8 +153,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Discussions](https://github.com/yourusername/react-tool-icons/discussions)
 
 ## Author
-
-Your Name ([@AdityaKumar41](https://github.com/AdityaKumar41))
+[@AdityaKumar41](https://github.com/AdityaKumar41)
 
 ## Acknowledgments
 
