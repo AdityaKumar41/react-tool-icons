@@ -154,7 +154,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Author
 
-Your Name ([@yourusername](https://github.com/yourusername))
+Your Name ([@AdityaKumar41](https://github.com/AdityaKumar41))
 
 ## Acknowledgments
 
