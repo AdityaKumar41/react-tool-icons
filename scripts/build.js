@@ -55,8 +55,8 @@ async function buildIcons() {
             .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
             .join('');
 
-          const categoryPrefix = category.charAt(0).toUpperCase() + category.slice(1);
-          const componentName = `${categoryPrefix}${baseName}Icon`;
+          // const categoryPrefix = category.charAt(0).toUpperCase() + category.slice(1);
+          const componentName = `${baseName}Icon`;
 
           console.log(`Converting: ${svgFile} to ${componentName}`);
 

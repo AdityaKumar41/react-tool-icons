@@ -4,18 +4,24 @@ import typescript from '@rollup/plugin-typescript';
 
 const config = {
   input: 'src/index.ts',
-  output: [
-    {
-      file: 'dist/index.esm.js',
-      format: 'esm',
-    },
-  ],
+  output: {
+    file: 'dist/index.esm.js',
+    format: 'es',
+    sourcemap: true
+  },
   external: [/@babel\/runtime/, 'react'],
   plugins: [
-    typescript(),
-    babel({ babelHelpers: 'runtime', plugins: ['@babel/plugin-transform-runtime'] }),
-    filesize(),
-  ],
+    typescript({
+      tsconfig: './tsconfig.json',
+      declaration: true,
+      declarationDir: 'dist'
+    }),
+    babel({ 
+      babelHelpers: 'runtime',
+      plugins: ['@babel/plugin-transform-runtime']
+    }),
+    filesize()
+  ]
 };
 
 export default config;
